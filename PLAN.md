@@ -203,7 +203,7 @@ create table public.newsletter_subscribers (
 
 **Shared:** `site-header` (nav + theme toggle + login/CTA), `site-footer`, `section` wrapper, `cta-band`, `seo` metadata helper.
 
-- **Home:** hero ("Get more direct bookings"), trust bar, problem→solution (escape OTA fees), services grid, how-it-works steps, featured work (host sites), results metrics, testimonials, pricing teaser, blog teaser, contact CTA.
+- **Home:** hero ("Get more direct bookings"), trust bar, problem→solution (escape OTA fees), services grid, how-it-works steps, results metrics, testimonials, pricing teaser, **FAQ accordion**, contact CTA. (Home FAQ + `/faq` share the same source — drafted static now in `lib/content/faq.ts`, moves to the `faqs` table/admin CMS in Step 8 so it's dashboard-editable.)
 - **About:** mission/story (help hosts own their bookings), values, approach, CTA.
 - **Services:** web design, direct-booking engine, brand/identity, channel & calendar sync, SEO/marketing → detail pages (problem → approach → deliverables → CTA).
 - **Work (Supabase):** case-study grid of host sites built → detail (cover, gallery, summary, challenge/solution markdown, results metrics). Empty-state friendly until you add entries.
