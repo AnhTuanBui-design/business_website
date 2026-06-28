@@ -1,11 +1,34 @@
+import type { Metadata } from "next";
+import { Benefits } from "@/components/sections/home/benefits";
+import { CtaBand } from "@/components/sections/home/cta-band";
+import { Faq } from "@/components/sections/home/faq";
+import { Hero } from "@/components/sections/home/hero";
+import { PricingTeaser } from "@/components/sections/home/pricing-teaser";
+import { Process } from "@/components/sections/home/process";
+import { Services } from "@/components/sections/home/services";
+import { Stats } from "@/components/sections/home/stats";
+import { Testimonial } from "@/components/sections/home/testimonial";
+import { TrustBar } from "@/components/sections/home/trust-bar";
+import { siteConfig } from "@/lib/content/site";
+
+export const metadata: Metadata = {
+    title: `${siteConfig.name} — Direct-booking websites for short-term rental hosts`,
+    description: siteConfig.description,
+};
+
 export default function HomePage() {
     return (
-        <section className="mx-auto flex max-w-container flex-col items-center justify-center gap-3 px-4 py-32 text-center md:px-8">
-            <span className="rounded-full bg-brand-primary px-3 py-1 text-sm font-medium text-brand-secondary">Getaways Collective</span>
-            <h1 className="max-w-2xl text-display-md font-semibold tracking-tight text-primary">Bespoke getaways, thoughtfully planned.</h1>
-            <p className="max-w-xl text-lg text-tertiary">
-                Foundations are in place — themed header, footer, and navigation. The full home page lands in the next step.
-            </p>
-        </section>
+        <>
+            <Hero />
+            <TrustBar />
+            <Benefits />
+            <Services />
+            <Process />
+            <Stats />
+            <Testimonial />
+            <PricingTeaser />
+            <Faq />
+            <CtaBand />
+        </>
     );
 }
