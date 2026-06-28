@@ -1,3 +1,39 @@
+# BookDirect Studio — Project Guide
+
+> **Read this first.** It governs how to work in this repo. The Untitled UI conventions further below (from the starter kit) still apply to component usage.
+
+**What this is:** **BookDirect Studio** — a B2B web studio that builds branded, direct-booking websites for short-term-rental / Airbnb hosts (so hosts win direct bookings and avoid OTA fees). Live at https://bookdirect.studio (Netlify). Repo: `AnhTuanBui-design/business_website`.
+
+## How to work (Explore → Plan → Code → Commit)
+1. **Plan first.** `PLAN.md` is the living plan — scope, structure, schema, build order. Read it before building; keep its **Progress** section current.
+2. **Don't build without approval.** Propose, then wait. Build **one step at a time** and **pause for review** before the next.
+3. **Commit per reviewed step** using Conventional Commits (`feat:`/`fix:`/`docs:`/`chore:`), scoped to one logical change, with the Co-Authored-By trailer.
+4. **Never deploy to Netlify without explicit approval** (cost-conscious). Local-first: run `npm run dev` and share the local link.
+5. **Supabase DDL only via the Management API** (`POST https://api.supabase.com/v1/projects/<ref>/database/query`) — direct Postgres fails from the sandbox.
+6. **Secrets** live in `.env.local` (gitignored) + Netlify env vars; never commit them. `.npmrc` uses `${UNTITLEDUI_PRO_TOKEN}`.
+7. **Emoji in the project path** → always use `next dev --webpack` / `next build --webpack` (Turbopack crashes).
+
+## Architecture & conventions
+- Next.js 16 App Router, `src/` dir, TypeScript, Tailwind v4, Untitled UI Pro + Icons Pro (line).
+- Route groups: `(marketing)` public · `(auth)` · `(app)` customer dashboard · `(admin)` admin.
+- Default to **Server Components**. When passing an Untitled UI icon to a client component (e.g. `Button`), pass it as an **element with `data-icon`** — `iconTrailing={<ArrowRight data-icon />}` — NOT as a function (functions can't cross the server→client boundary).
+- Composed page sections → `src/components/sections/`; static content → `src/lib/content/`; Supabase clients → `src/lib/supabase/`; auth refresh → `src/proxy.ts`.
+- Vendored Untitled UI in `src/components/{base,application,marketing,foundations,shared-assets}` — **compose, don't fork**.
+- Filenames **kebab-case**; `react-aria-components` imports prefixed **`Aria*`**; use `cx`/`sortCx`. Verify icon names before importing (`node -e "require('@untitledui/icons').Name"`).
+- Brand = ocean-teal via `--color-brand-*` in `src/styles/theme.css` (all tokens cascade).
+
+## Integrations
+- **Supabase** project `business_website` / ref `cyndqrwsiaszpgnuidsf`.
+- **Netlify** site `business-website-atb` (id `0b8e1c5a-bbec-493d-b421-cacf0c8daabb`), domain `bookdirect.studio`. DNS + email at **Hostinger** — don't move nameservers (breaks email).
+
+## Subagents (`.claude/agents/`)
+- **`ui-page-builder`** — build/extend marketing pages & sections with Untitled UI + these conventions.
+- **`supabase-migrator`** — apply schema/RLS/seed via the Management API.
+
+---
+
+## Untitled UI starter conventions (component library reference)
+
 ## Project Overview
 
 This is an **Untitled UI React** component library project built with:
