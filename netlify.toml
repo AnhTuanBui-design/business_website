@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # Pin Node to match local dev (Next 16 / React 19)
+  NODE_VERSION = "22"
+
+# Official Next.js runtime for Netlify (App Router, SSR, middleware, image opt.)
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
