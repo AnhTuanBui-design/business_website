@@ -79,6 +79,22 @@ export const needsInput: string[] = [
     "Set up production email (SMTP) for auth and notification emails.",
 ];
 
+/**
+ * The 5 questions that would most unblock the next day of work.
+ * PROTOCOL: only refresh `updated` + `questions` when the owner asks
+ * "What 5 questions you need to move forward to work next day?".
+ */
+export const openQuestions: { updated: string; questions: string[] } = {
+    updated: "2026-06-28",
+    questions: [
+        "What are the real pricing tiers and amounts? (Placeholder prices are live now.)",
+        "When someone submits the contact form, should it also email you (set up SMTP/Resend), or just appear in the admin inbox?",
+        "Can you share 1–3 real host projects (names, photos, results) for the Work page, or should we use anonymised samples for now?",
+        "Do you have a logo file and brand photography, or should we keep the wordmark + placeholder imagery for launch?",
+        "What's the must-have scope and target date for launch — does it include the blog and a newsletter sign-up, or are those post-launch?",
+    ],
+};
+
 export const logEntries: LogEntry[] = [
     {
         date: "2026-06-28",

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { FeaturedIcon } from "@/components/foundations/featured-icon/featured-icon";
 import { Logo } from "@/components/layout/logo";
-import { builtLinks, logEntries, needsInput, roadmap, type BuiltLink } from "@/lib/content/log";
+import { builtLinks, logEntries, needsInput, openQuestions, roadmap, type BuiltLink } from "@/lib/content/log";
 import { createClient } from "@/lib/supabase/server";
 import { cx } from "@/utils/cx";
 
@@ -121,6 +121,24 @@ export default async function LogPage() {
                         ))}
                     </ul>
                 </div>
+            </section>
+
+            {/* 5 questions to move forward — refreshed only on request */}
+            <section className="mt-12">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <h2 className="text-sm font-semibold text-primary">5 questions to move forward</h2>
+                    <span className="text-xs text-quaternary">Updated {formatDate(openQuestions.updated).day}</span>
+                </div>
+                <ol className="mt-4 flex flex-col gap-3">
+                    {openQuestions.questions.map((question, i) => (
+                        <li key={i} className="flex gap-4 rounded-2xl border border-secondary bg-secondary p-5">
+                            <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-solid text-sm font-semibold text-white">
+                                {i + 1}
+                            </span>
+                            <p className="text-md text-secondary">{question}</p>
+                        </li>
+                    ))}
+                </ol>
             </section>
 
             <h2 className="mt-12 text-sm font-semibold text-primary">Timeline</h2>
