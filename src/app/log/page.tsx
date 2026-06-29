@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { ArrowUpRight } from "@untitledui/icons";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { FeaturedIcon } from "@/components/foundations/featured-icon/featured-icon";
 import { Logo } from "@/components/layout/logo";
 import { builtLinks, logEntries, needsInput, openQuestions, roadmap, type BuiltLink } from "@/lib/content/log";
 import { createClient } from "@/lib/supabase/server";
 import { cx } from "@/utils/cx";
+import { AllTimelineModal } from "./all-timeline-modal";
 import { QuestionsEditor } from "./questions-editor";
+import { TimelineEntries } from "./timeline-entries";
 
 const statusStyles: Record<string, string> = {
     "In progress": "bg-brand-primary text-brand-secondary",
@@ -22,14 +23,9 @@ export const metadata: Metadata = {
 
 function formatDate(iso: string) {
     const d = new Date(`${iso}T00:00:00`);
-    return {
-        day: d.toLocaleDateString("en-US", { day: "numeric", month: "short" }),
-        year: d.toLocaleDateString("en-US", { year: "numeric" }),
-        weekday: d.toLocaleDateString("en-US", { weekday: "long" }),
-    };
+    return { day: d.toLocaleDateString("en-US", { day: "numeric", month: "short" }) };
 }
 
-/** A column of shipped links (label + arrow on the left, date on the right). */
 function LinkColumn({ title, links }: { title: string; links: BuiltLink[] }) {
     return (
         <div>
@@ -51,6 +47,8 @@ function LinkColumn({ title, links }: { title: string; links: BuiltLink[] }) {
     );
 }
 
+const tocLinkClass = "-ml-px block border-l-2 border-transparent pl-3 text-tertiary transition-colors hover:border-brand hover:text-primary";
+
 export default async function LogPage() {
     const supabase = await createClient();
     const {
@@ -70,8 +68,11 @@ export default async function LogPage() {
         if (row.answer != null) answers[row.idx] = row.answer;
     });
 
+    const latestDays = logEntries.slice(0, 5);
+    const hasMoreDays = logEntries.length > 5;
+
     return (
-        <div className="mx-auto max-w-4xl px-4 py-12 md:px-8">
+        <div className="mx-auto max-w-6xl px-4 py-12 md:px-8">
             <div className="flex items-center justify-between gap-4">
                 <Link href="/admin" aria-label="Admin home">
                     <Logo />
@@ -87,91 +88,107 @@ export default async function LogPage() {
                 <p className="mt-3 text-lg text-tertiary">A running record of progress — pages shipped, work done each day, and what's next.</p>
             </header>
 
-            {/* Pages shipped — two columns (Public / Account & admin), label + date */}
-            <section className="mt-10 rounded-2xl border border-secondary p-6 md:p-8">
-                <h2 className="text-xs font-semibold tracking-wide text-quaternary uppercase">Pages built &amp; when ({builtLinks.length})</h2>
-                <div className="mt-6 grid gap-x-12 gap-y-8 sm:grid-cols-2">
-                    <LinkColumn title="Public" links={publicLinks} />
-                    <LinkColumn title="Account & admin (login)" links={accountLinks} />
-                </div>
-            </section>
-
-            {/* What's next — forward action plan */}
-            <section className="mt-12">
-                <h2 className="text-sm font-semibold text-primary">What's next</h2>
-                <div className="mt-4 flex flex-col gap-3">
-                    {roadmap.map((item) => (
-                        <div key={item.title} className="flex flex-col gap-2 rounded-2xl border border-secondary bg-secondary p-5 sm:flex-row sm:items-start sm:gap-4">
-                            <span
-                                className={cx(
-                                    "w-fit rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap sm:mt-0.5",
-                                    statusStyles[item.status],
-                                )}
-                            >
-                                {item.status}
-                            </span>
-                            <div>
-                                <h3 className="text-md font-semibold text-primary">{item.title}</h3>
-                                <p className="mt-0.5 text-sm text-tertiary">{item.detail}</p>
-                            </div>
+            <div className="mt-10 gap-12 lg:grid lg:grid-cols-[minmax(0,1fr)_200px]">
+                {/* Main content */}
+                <div className="min-w-0">
+                    {/* Pages shipped */}
+                    <section id="pages" className="scroll-mt-8 rounded-2xl border border-secondary p-6 md:p-8">
+                        <h2 className="text-xs font-semibold tracking-wide text-quaternary uppercase">Pages built &amp; when ({builtLinks.length})</h2>
+                        <div className="mt-6 grid gap-x-12 gap-y-8 sm:grid-cols-2">
+                            <LinkColumn title="Public" links={publicLinks} />
+                            <LinkColumn title="Account & admin (login)" links={accountLinks} />
                         </div>
-                    ))}
-                </div>
+                    </section>
 
-                <div className="mt-5 rounded-2xl border border-secondary bg-secondary p-5">
-                    <h3 className="text-sm font-semibold text-primary">Needs your input</h3>
-                    <ul className="mt-2 flex flex-col gap-1.5">
-                        {needsInput.map((item) => (
-                            <li key={item} className="text-sm text-tertiary">
-                                • {item}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </section>
-
-            {/* 5 questions to move forward — editable, persisted, lock/unlock */}
-            <QuestionsEditor questions={openQuestions.questions} answers={answers} updated={formatDate(openQuestions.updated).day} />
-
-            <h2 className="mt-12 text-sm font-semibold text-primary">Timeline</h2>
-            <div className="mt-4 flex flex-col gap-10">
-                {logEntries.map((entry) => {
-                    const date = formatDate(entry.date);
-                    return (
-                        <article key={entry.date} className="flex flex-col gap-4 md:flex-row md:gap-8">
-                            {/* Date — left column */}
-                            <div className="shrink-0 md:w-36 md:pt-1 md:text-right">
-                                <div className="text-md font-semibold text-primary">{date.day}</div>
-                                <div className="text-sm text-tertiary">{date.year}</div>
-                                <div className="text-xs text-quaternary">{date.weekday}</div>
-                            </div>
-
-                            {/* Content — right column */}
-                            <div className="flex-1 rounded-2xl border border-secondary bg-secondary p-6 md:p-8">
-                                <h2 className="text-lg font-semibold text-primary">{entry.title}</h2>
-                                {entry.summary && <p className="mt-1.5 text-md text-tertiary">{entry.summary}</p>}
-
-                                <div className="mt-6 flex flex-col gap-6">
-                                    {entry.groups.map((group) => (
-                                        <section key={group.heading} className="flex gap-4">
-                                            <FeaturedIcon icon={group.icon} color="brand" theme="light" size="md" className="mt-0.5" />
-                                            <div>
-                                                <h3 className="text-sm font-semibold text-primary">{group.heading}</h3>
-                                                <ul className="mt-2 flex flex-col gap-1.5">
-                                                    {group.items.map((item) => (
-                                                        <li key={item} className="text-sm text-tertiary">
-                                                            {item}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        </section>
-                                    ))}
+                    {/* What's next */}
+                    <section id="whats-next" className="mt-12 scroll-mt-8">
+                        <h2 className="text-sm font-semibold text-primary">What's next</h2>
+                        <div className="mt-4 flex flex-col gap-3">
+                            {roadmap.map((item) => (
+                                <div
+                                    key={item.title}
+                                    className="flex flex-col gap-2 rounded-2xl border border-secondary bg-secondary p-5 sm:flex-row sm:items-start sm:gap-4"
+                                >
+                                    <span
+                                        className={cx(
+                                            "w-fit rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap sm:mt-0.5",
+                                            statusStyles[item.status],
+                                        )}
+                                    >
+                                        {item.status}
+                                    </span>
+                                    <div>
+                                        <h3 className="text-md font-semibold text-primary">{item.title}</h3>
+                                        <p className="mt-0.5 text-sm text-tertiary">{item.detail}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </article>
-                    );
-                })}
+                            ))}
+                        </div>
+
+                        <div className="mt-5 rounded-2xl border border-secondary bg-secondary p-5">
+                            <h3 className="text-sm font-semibold text-primary">Needs your input</h3>
+                            <ul className="mt-2 flex flex-col gap-1.5">
+                                {needsInput.map((item) => (
+                                    <li key={item} className="text-sm text-tertiary">
+                                        • {item}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </section>
+
+                    {/* 5 questions — editable, persisted, lock/unlock */}
+                    <div id="questions" className="scroll-mt-8">
+                        <QuestionsEditor questions={openQuestions.questions} answers={answers} updated={formatDate(openQuestions.updated).day} />
+                    </div>
+
+                    {/* Timeline — latest 5 days inline + full timeline in a modal */}
+                    <section id="timeline" className="mt-12 scroll-mt-8">
+                        <h2 className="text-sm font-semibold text-primary">Timeline {hasMoreDays && <span className="text-quaternary">(latest 5)</span>}</h2>
+                        <div className="mt-4">
+                            <TimelineEntries entries={latestDays} />
+                        </div>
+                        {hasMoreDays && <AllTimelineModal />}
+                    </section>
+                </div>
+
+                {/* Sticky table of contents */}
+                <aside className="hidden lg:block">
+                    <nav className="sticky top-8">
+                        <p className="text-xs font-semibold tracking-wide text-quaternary uppercase">On this page</p>
+                        <ul className="mt-3 flex flex-col gap-2 border-l border-secondary text-sm">
+                            <li>
+                                <a href="#pages" className={tocLinkClass}>
+                                    Pages built
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#whats-next" className={tocLinkClass}>
+                                    What's next
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#questions" className={tocLinkClass}>
+                                    5 questions
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#timeline" className={tocLinkClass}>
+                                    Timeline
+                                </a>
+                                <ul className="mt-2 flex flex-col gap-1.5 pl-3">
+                                    {latestDays.map((entry) => (
+                                        <li key={entry.date}>
+                                            <a href={`#day-${entry.date}`} className="text-xs text-quaternary transition-colors hover:text-primary">
+                                                {formatDate(entry.date).day}
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </li>
+                        </ul>
+                    </nav>
+                </aside>
             </div>
         </div>
     );
