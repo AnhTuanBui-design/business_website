@@ -67,7 +67,7 @@ marketing site, backend, auth, and admin foundation following Explore → Plan �
 6. **Polish** — SEO metadata, `sitemap.ts`/`robots.ts`, OG images, `next/image` remote patterns for Supabase, a11y pass.
 
 ### Operational notes
-- **Deploy:** `netlify deploy --build --prod --site 0b8e1c5a-bbec-493d-b421-cacf0c8daabb` (only on explicit approval).
+- **Deploy (CI):** GitHub → Netlify continuous deploy is linked — **push to `main` auto-deploys to production**. Workflow: feature branch → push (deploy preview) → PR → merge to `main` to ship. Manual fallback: `netlify deploy --build --prod --site 0b8e1c5a-bbec-493d-b421-cacf0c8daabb`.
 - **Admin login:** https://bookdirect.studio/login (admin email + generated password — stored in password manager).
 - **DNS + email:** managed at Hostinger — do not move nameservers to Netlify.
 - **TODO (user):** rotate all tokens shared during setup; set real pricing; have legal pages reviewed; set Terms governing-law jurisdiction; configure production SMTP for auth emails.
