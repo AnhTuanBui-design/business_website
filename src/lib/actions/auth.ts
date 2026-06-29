@@ -6,6 +6,16 @@ import { forgotPasswordSchema, loginSchema, signUpSchema, updatePasswordSchema }
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
+/** Where to send a user after authenticating: admins to /admin, everyone else to /dashboard. */
+async function postAuthDestination(supabase: Awaited<ReturnType<typeof createClient>>): Promise<string> {
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return "/dashboard";
+    const { data } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+    return data?.role === "admin" ? "/admin" : "/dashboard";
+}
+
 export type AuthActionState = {
     error?: string;
     fieldErrors?: Record<string, string[]>;
@@ -39,7 +49,7 @@ export async function signInAction(_prevState: AuthActionState, formData: FormDa
         return { error: error.message };
     }
 
-    redirect("/dashboard");
+    redirect(await postAuthDestination(supabase));
 }
 
 // ---------------------------------------------------------------------------
@@ -129,7 +139,7 @@ export async function updatePasswordAction(_prevState: AuthActionState, formData
         return { error: error.message };
     }
 
-    redirect("/dashboard");
+    redirect(await postAuthDestination(supabase));
 }
 
 // ---------------------------------------------------------------------------
