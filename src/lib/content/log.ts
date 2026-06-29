@@ -19,6 +19,33 @@ export interface LogEntry {
     groups: LogGroup[];
 }
 
+/** A shipped route, shown in the "Pages shipped" index at the top of /log. */
+export interface BuiltLink {
+    path: string;
+    label: string;
+    /** ISO date this page first shipped. */
+    date: string;
+    access: "Public" | "Account" | "Admin";
+}
+
+/** Every page we've built, with the date it shipped. Add new rows as we ship. */
+export const builtLinks: BuiltLink[] = [
+    { path: "/", label: "Home", date: "2026-06-28", access: "Public" },
+    { path: "/services", label: "Services (+ 5 detail pages)", date: "2026-06-28", access: "Public" },
+    { path: "/pricing", label: "Pricing", date: "2026-06-28", access: "Public" },
+    { path: "/work", label: "Work / case studies", date: "2026-06-28", access: "Public" },
+    { path: "/about", label: "About", date: "2026-06-28", access: "Public" },
+    { path: "/privacy", label: "Privacy", date: "2026-06-28", access: "Public" },
+    { path: "/terms", label: "Terms", date: "2026-06-28", access: "Public" },
+    { path: "/login", label: "Log in", date: "2026-06-28", access: "Public" },
+    { path: "/sign-up", label: "Sign up", date: "2026-06-28", access: "Public" },
+    { path: "/forgot-password", label: "Forgot password", date: "2026-06-28", access: "Public" },
+    { path: "/update-password", label: "Update password", date: "2026-06-28", access: "Public" },
+    { path: "/dashboard", label: "Customer dashboard (placeholder)", date: "2026-06-28", access: "Account" },
+    { path: "/admin", label: "Admin overview", date: "2026-06-28", access: "Admin" },
+    { path: "/log", label: "Build log (this page)", date: "2026-06-28", access: "Admin" },
+];
+
 export const logEntries: LogEntry[] = [
     {
         date: "2026-06-28",

@@ -3,8 +3,15 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { FeaturedIcon } from "@/components/foundations/featured-icon/featured-icon";
 import { Logo } from "@/components/layout/logo";
-import { logEntries } from "@/lib/content/log";
+import { builtLinks, logEntries } from "@/lib/content/log";
 import { createClient } from "@/lib/supabase/server";
+import { cx } from "@/utils/cx";
+
+const accessStyles: Record<string, string> = {
+    Public: "bg-success-secondary text-success-primary",
+    Account: "bg-brand-primary text-brand-secondary",
+    Admin: "bg-warning-secondary text-warning-primary",
+};
 
 export const metadata: Metadata = {
     title: "Build Log — BookDirect Studio",
@@ -46,7 +53,45 @@ export default async function LogPage() {
                 <p className="mt-1 text-sm text-tertiary">A daily record of what we shipped. Newest first · admin only.</p>
             </header>
 
-            <div className="mt-10 flex flex-col gap-10">
+            {/* Always-visible index of shipped pages + the date each went live */}
+            <section className="mt-8 overflow-hidden rounded-2xl border border-secondary bg-secondary">
+                <div className="border-b border-secondary px-5 py-3">
+                    <h2 className="text-sm font-semibold text-primary">Pages shipped ({builtLinks.length})</h2>
+                </div>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                        <thead>
+                            <tr className="border-b border-secondary text-xs text-quaternary">
+                                <th className="px-5 py-2.5 font-medium">Page</th>
+                                <th className="px-5 py-2.5 font-medium">Path</th>
+                                <th className="px-5 py-2.5 font-medium">Built</th>
+                                <th className="px-5 py-2.5 font-medium">Access</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {builtLinks.map((link) => (
+                                <tr key={link.path} className="border-b border-secondary last:border-0">
+                                    <td className="px-5 py-2.5 font-medium text-primary">{link.label}</td>
+                                    <td className="px-5 py-2.5">
+                                        <Link href={link.path} className="font-mono text-brand-secondary hover:text-brand-secondary_hover">
+                                            {link.path}
+                                        </Link>
+                                    </td>
+                                    <td className="px-5 py-2.5 whitespace-nowrap text-tertiary">{formatDate(link.date).day}</td>
+                                    <td className="px-5 py-2.5">
+                                        <span className={cx("rounded-full px-2 py-0.5 text-xs font-medium", accessStyles[link.access])}>
+                                            {link.access}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <h2 className="mt-12 text-sm font-semibold text-primary">Timeline</h2>
+            <div className="mt-4 flex flex-col gap-10">
                 {logEntries.map((entry) => {
                     const date = formatDate(entry.date);
                     return (
