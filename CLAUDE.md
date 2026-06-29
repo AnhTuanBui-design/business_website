@@ -8,7 +8,7 @@
 1. **Plan first.** `PLAN.md` is the living plan — scope, structure, schema, build order. Read it before building; keep its **Progress** section current.
 2. **Don't build without approval.** Propose, then wait. Build **one step at a time** and **pause for review** before the next.
 3. **Commit per reviewed step** using Conventional Commits (`feat:`/`fix:`/`docs:`/`chore:`), scoped to one logical change, with the Co-Authored-By trailer.
-4. **Never deploy to Netlify without explicit approval** (cost-conscious). Local-first: run `npm run dev` and share the local link.
+4. **Deploys are automatic via GitHub → Netlify CI** — pushing to `main` auto-deploys to production (https://bookdirect.studio). So **work on feature branches**, push the branch (Netlify builds a **deploy preview**), open a **PR**, and let the user **merge to `main`** to ship. **Do NOT push to `main` without approval** — a push to main is a production deploy. Iterate locally with `npm run dev`.
 5. **Supabase DDL only via the Management API** (`POST https://api.supabase.com/v1/projects/<ref>/database/query`) — direct Postgres fails from the sandbox.
 6. **Secrets** live in `.env.local` (gitignored) + Netlify env vars; never commit them. `.npmrc` uses `${UNTITLEDUI_PRO_TOKEN}`.
 7. **Emoji in the project path** → always use `next dev --webpack` / `next build --webpack` (Turbopack crashes).
