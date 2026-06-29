@@ -7,6 +7,7 @@ import { Logo } from "@/components/layout/logo";
 import { builtLinks, logEntries, needsInput, openQuestions, roadmap, type BuiltLink } from "@/lib/content/log";
 import { createClient } from "@/lib/supabase/server";
 import { cx } from "@/utils/cx";
+import { QuestionsEditor } from "./questions-editor";
 
 const statusStyles: Record<string, string> = {
     "In progress": "bg-brand-primary text-brand-secondary",
@@ -62,6 +63,12 @@ export default async function LogPage() {
 
     const publicLinks = builtLinks.filter((link) => link.access === "Public");
     const accountLinks = builtLinks.filter((link) => link.access !== "Public");
+
+    const { data: answerRows } = await supabase.from("log_answers").select("idx, answer");
+    const answers: Record<number, string> = {};
+    (answerRows ?? []).forEach((row) => {
+        if (row.answer != null) answers[row.idx] = row.answer;
+    });
 
     return (
         <div className="mx-auto max-w-4xl px-4 py-12 md:px-8">
@@ -123,23 +130,8 @@ export default async function LogPage() {
                 </div>
             </section>
 
-            {/* 5 questions to move forward — refreshed only on request */}
-            <section className="mt-12">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h2 className="text-sm font-semibold text-primary">5 questions to move forward</h2>
-                    <span className="text-xs text-quaternary">Updated {formatDate(openQuestions.updated).day}</span>
-                </div>
-                <ol className="mt-4 flex flex-col gap-3">
-                    {openQuestions.questions.map((question, i) => (
-                        <li key={i} className="flex gap-4 rounded-2xl border border-secondary bg-secondary p-5">
-                            <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-solid text-sm font-semibold text-white">
-                                {i + 1}
-                            </span>
-                            <p className="text-md text-secondary">{question}</p>
-                        </li>
-                    ))}
-                </ol>
-            </section>
+            {/* 5 questions to move forward — editable, persisted, lock/unlock */}
+            <QuestionsEditor questions={openQuestions.questions} answers={answers} updated={formatDate(openQuestions.updated).day} />
 
             <h2 className="mt-12 text-sm font-semibold text-primary">Timeline</h2>
             <div className="mt-4 flex flex-col gap-10">
