@@ -37,10 +37,10 @@ export const builtLinks: BuiltLink[] = [
     { path: "/about", label: "About", date: "2026-06-28", access: "Public" },
     { path: "/privacy", label: "Privacy", date: "2026-06-28", access: "Public" },
     { path: "/terms", label: "Terms", date: "2026-06-28", access: "Public" },
-    { path: "/login", label: "Log in", date: "2026-06-28", access: "Public" },
-    { path: "/sign-up", label: "Sign up", date: "2026-06-28", access: "Public" },
-    { path: "/forgot-password", label: "Forgot password", date: "2026-06-28", access: "Public" },
-    { path: "/update-password", label: "Update password", date: "2026-06-28", access: "Public" },
+    { path: "/login", label: "Log in", date: "2026-06-28", access: "Account" },
+    { path: "/sign-up", label: "Sign up", date: "2026-06-28", access: "Account" },
+    { path: "/forgot-password", label: "Forgot password", date: "2026-06-28", access: "Account" },
+    { path: "/update-password", label: "Update password", date: "2026-06-28", access: "Account" },
     { path: "/dashboard", label: "Customer dashboard (placeholder)", date: "2026-06-28", access: "Account" },
     { path: "/admin", label: "Admin overview", date: "2026-06-28", access: "Admin" },
     { path: "/log", label: "Build log (this page)", date: "2026-06-28", access: "Admin" },
@@ -78,6 +78,22 @@ export const needsInput: string[] = [
     "Have Privacy/Terms reviewed by a professional and set the Terms jurisdiction.",
     "Set up production email (SMTP) for auth and notification emails.",
 ];
+
+/**
+ * The 5 questions that would most unblock the next day of work.
+ * PROTOCOL: only refresh `updated` + `questions` when the owner asks
+ * "What 5 questions you need to move forward to work next day?".
+ */
+export const openQuestions: { updated: string; questions: string[] } = {
+    updated: "2026-06-28",
+    questions: [
+        "What are the real pricing tiers and amounts? (Placeholder prices are live now.)",
+        "When someone submits the contact form, should it also email you (set up SMTP/Resend), or just appear in the admin inbox?",
+        "Can you share 1–3 real host projects (names, photos, results) for the Work page, or should we use anonymised samples for now?",
+        "Do you have a logo file and brand photography, or should we keep the wordmark + placeholder imagery for launch?",
+        "What's the must-have scope and target date for launch — does it include the blog and a newsletter sign-up, or are those post-launch?",
+    ],
+};
 
 export const logEntries: LogEntry[] = [
     {
