@@ -1,17 +1,12 @@
 import type { Metadata } from "next";
+import { ArrowUpRight } from "@untitledui/icons";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { FeaturedIcon } from "@/components/foundations/featured-icon/featured-icon";
 import { Logo } from "@/components/layout/logo";
-import { builtLinks, logEntries, needsInput, roadmap } from "@/lib/content/log";
+import { builtLinks, logEntries, needsInput, roadmap, type BuiltLink } from "@/lib/content/log";
 import { createClient } from "@/lib/supabase/server";
 import { cx } from "@/utils/cx";
-
-const accessStyles: Record<string, string> = {
-    Public: "bg-success-secondary text-success-primary",
-    Account: "bg-brand-primary text-brand-secondary",
-    Admin: "bg-warning-secondary text-warning-primary",
-};
 
 const statusStyles: Record<string, string> = {
     "In progress": "bg-brand-primary text-brand-secondary",
@@ -33,6 +28,28 @@ function formatDate(iso: string) {
     };
 }
 
+/** A column of shipped links (label + arrow on the left, date on the right). */
+function LinkColumn({ title, links }: { title: string; links: BuiltLink[] }) {
+    return (
+        <div>
+            <h3 className="text-xs font-semibold tracking-wide text-quaternary uppercase">{title}</h3>
+            <ul className="mt-2">
+                {links.map((link) => (
+                    <li key={link.path} className="border-b border-secondary last:border-0">
+                        <Link href={link.path} className="group flex items-center justify-between gap-4 py-3">
+                            <span className="flex items-center gap-1.5 text-md font-medium text-primary">
+                                {link.label}
+                                <ArrowUpRight className="size-4 text-fg-quaternary transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                            </span>
+                            <time className="shrink-0 text-sm text-tertiary">{formatDate(link.date).day}</time>
+                        </Link>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+}
+
 export default async function LogPage() {
     const supabase = await createClient();
     const {
@@ -42,6 +59,9 @@ export default async function LogPage() {
 
     const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
     if (profile?.role !== "admin") redirect("/");
+
+    const publicLinks = builtLinks.filter((link) => link.access === "Public");
+    const accountLinks = builtLinks.filter((link) => link.access !== "Public");
 
     return (
         <div className="mx-auto max-w-4xl px-4 py-12 md:px-8">
@@ -54,45 +74,18 @@ export default async function LogPage() {
                 </Link>
             </div>
 
-            <header className="mt-8">
-                <h1 className="text-display-xs font-semibold tracking-tight text-primary">Build log</h1>
-                <p className="mt-1 text-sm text-tertiary">A daily record of what we shipped. Newest first · admin only.</p>
+            <header className="mt-10">
+                <p className="text-sm font-semibold tracking-wide text-brand-secondary uppercase">Build log</p>
+                <h1 className="mt-2 text-display-md font-semibold tracking-tight text-primary">What we've built</h1>
+                <p className="mt-3 text-lg text-tertiary">A running record of progress — pages shipped, work done each day, and what's next.</p>
             </header>
 
-            {/* Always-visible index of shipped pages + the date each went live */}
-            <section className="mt-8 overflow-hidden rounded-2xl border border-secondary bg-secondary">
-                <div className="border-b border-secondary px-5 py-3">
-                    <h2 className="text-sm font-semibold text-primary">Pages shipped ({builtLinks.length})</h2>
-                </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
-                        <thead>
-                            <tr className="border-b border-secondary text-xs text-quaternary">
-                                <th className="px-5 py-2.5 font-medium">Page</th>
-                                <th className="px-5 py-2.5 font-medium">Path</th>
-                                <th className="px-5 py-2.5 font-medium">Built</th>
-                                <th className="px-5 py-2.5 font-medium">Access</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {builtLinks.map((link) => (
-                                <tr key={link.path} className="border-b border-secondary last:border-0">
-                                    <td className="px-5 py-2.5 font-medium text-primary">{link.label}</td>
-                                    <td className="px-5 py-2.5">
-                                        <Link href={link.path} className="font-mono text-brand-secondary hover:text-brand-secondary_hover">
-                                            {link.path}
-                                        </Link>
-                                    </td>
-                                    <td className="px-5 py-2.5 whitespace-nowrap text-tertiary">{formatDate(link.date).day}</td>
-                                    <td className="px-5 py-2.5">
-                                        <span className={cx("rounded-full px-2 py-0.5 text-xs font-medium", accessStyles[link.access])}>
-                                            {link.access}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+            {/* Pages shipped — two columns (Public / Account & admin), label + date */}
+            <section className="mt-10 rounded-2xl border border-secondary p-6 md:p-8">
+                <h2 className="text-xs font-semibold tracking-wide text-quaternary uppercase">Pages built &amp; when ({builtLinks.length})</h2>
+                <div className="mt-6 grid gap-x-12 gap-y-8 sm:grid-cols-2">
+                    <LinkColumn title="Public" links={publicLinks} />
+                    <LinkColumn title="Account & admin (login)" links={accountLinks} />
                 </div>
             </section>
 
