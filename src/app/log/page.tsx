@@ -7,6 +7,7 @@ import { builtLinks, logEntries, needsInput, openQuestions, roadmap, type BuiltL
 import { createClient } from "@/lib/supabase/server";
 import { cx } from "@/utils/cx";
 import { AllTimelineModal } from "./all-timeline-modal";
+import { LogToc } from "./log-toc";
 import { QuestionsEditor } from "./questions-editor";
 import { TimelineEntries } from "./timeline-entries";
 
@@ -47,8 +48,6 @@ function LinkColumn({ title, links }: { title: string; links: BuiltLink[] }) {
     );
 }
 
-const tocLinkClass = "-ml-px block border-l-2 border-transparent pl-3 text-tertiary transition-colors hover:border-brand hover:text-primary";
-
 export default async function LogPage() {
     const supabase = await createClient();
     const {
@@ -70,6 +69,13 @@ export default async function LogPage() {
 
     const latestDays = logEntries.slice(0, 5);
     const hasMoreDays = logEntries.length > 5;
+
+    const tocItems = [
+        { id: "pages", label: "Pages built" },
+        { id: "whats-next", label: "What's next" },
+        { id: "questions", label: "5 questions" },
+        { id: "timeline", label: "Timeline", children: latestDays.map((entry) => ({ id: `day-${entry.date}`, label: formatDate(entry.date).day })) },
+    ];
 
     return (
         <div className="mx-auto max-w-6xl px-4 py-12 md:px-8">
@@ -152,43 +158,8 @@ export default async function LogPage() {
                     </section>
                 </div>
 
-                {/* Sticky table of contents */}
-                <aside className="hidden lg:block">
-                    <nav className="sticky top-8">
-                        <p className="text-xs font-semibold tracking-wide text-quaternary uppercase">On this page</p>
-                        <ul className="mt-3 flex flex-col gap-2 border-l border-secondary text-sm">
-                            <li>
-                                <a href="#pages" className={tocLinkClass}>
-                                    Pages built
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#whats-next" className={tocLinkClass}>
-                                    What's next
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#questions" className={tocLinkClass}>
-                                    5 questions
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#timeline" className={tocLinkClass}>
-                                    Timeline
-                                </a>
-                                <ul className="mt-2 flex flex-col gap-1.5 pl-3">
-                                    {latestDays.map((entry) => (
-                                        <li key={entry.date}>
-                                            <a href={`#day-${entry.date}`} className="text-xs text-quaternary transition-colors hover:text-primary">
-                                                {formatDate(entry.date).day}
-                                            </a>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </li>
-                        </ul>
-                    </nav>
-                </aside>
+                {/* Sticky table of contents with scroll-spy */}
+                <LogToc items={tocItems} />
             </div>
         </div>
     );
