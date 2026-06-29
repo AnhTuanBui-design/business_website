@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { FeaturedIcon } from "@/components/foundations/featured-icon/featured-icon";
 import { Logo } from "@/components/layout/logo";
-import { builtLinks, logEntries } from "@/lib/content/log";
+import { builtLinks, logEntries, needsInput, roadmap } from "@/lib/content/log";
 import { createClient } from "@/lib/supabase/server";
 import { cx } from "@/utils/cx";
 
@@ -11,6 +11,12 @@ const accessStyles: Record<string, string> = {
     Public: "bg-success-secondary text-success-primary",
     Account: "bg-brand-primary text-brand-secondary",
     Admin: "bg-warning-secondary text-warning-primary",
+};
+
+const statusStyles: Record<string, string> = {
+    "In progress": "bg-brand-primary text-brand-secondary",
+    Next: "bg-warning-secondary text-warning-primary",
+    Planned: "bg-tertiary text-tertiary",
 };
 
 export const metadata: Metadata = {
@@ -87,6 +93,40 @@ export default async function LogPage() {
                             ))}
                         </tbody>
                     </table>
+                </div>
+            </section>
+
+            {/* What's next — forward action plan */}
+            <section className="mt-12">
+                <h2 className="text-sm font-semibold text-primary">What's next</h2>
+                <div className="mt-4 flex flex-col gap-3">
+                    {roadmap.map((item) => (
+                        <div key={item.title} className="flex flex-col gap-2 rounded-2xl border border-secondary bg-secondary p-5 sm:flex-row sm:items-start sm:gap-4">
+                            <span
+                                className={cx(
+                                    "w-fit rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap sm:mt-0.5",
+                                    statusStyles[item.status],
+                                )}
+                            >
+                                {item.status}
+                            </span>
+                            <div>
+                                <h3 className="text-md font-semibold text-primary">{item.title}</h3>
+                                <p className="mt-0.5 text-sm text-tertiary">{item.detail}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="mt-5 rounded-2xl border border-secondary bg-secondary p-5">
+                    <h3 className="text-sm font-semibold text-primary">Needs your input</h3>
+                    <ul className="mt-2 flex flex-col gap-1.5">
+                        {needsInput.map((item) => (
+                            <li key={item} className="text-sm text-tertiary">
+                                • {item}
+                            </li>
+                        ))}
+                    </ul>
                 </div>
             </section>
 

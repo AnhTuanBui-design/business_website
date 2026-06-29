@@ -46,6 +46,39 @@ export const builtLinks: BuiltLink[] = [
     { path: "/log", label: "Build log (this page)", date: "2026-06-28", access: "Admin" },
 ];
 
+/** Forward-looking roadmap item shown in "What's next" on /log. */
+export interface RoadmapItem {
+    title: string;
+    detail: string;
+    status: "In progress" | "Next" | "Planned";
+}
+
+/** What we plan to build next, in priority order. */
+export const roadmap: RoadmapItem[] = [
+    {
+        title: "Contact page + leads inbox",
+        detail: 'Contact form that saves to Supabase, plus an admin inbox. Unblocks every "Get a quote" button.',
+        status: "In progress",
+    },
+    {
+        title: "Admin Work manager",
+        detail: "Create, edit, and publish case studies with image upload, so the Work page fills up.",
+        status: "Next",
+    },
+    { title: "FAQ manager", detail: "Edit FAQs from the dashboard; the home page and /faq read from the database.", status: "Planned" },
+    { title: "Blog", detail: "Public articles + an admin editor (Markdown).", status: "Planned" },
+    { title: "Customer dashboard", detail: "Account profile, settings, and avatar upload.", status: "Planned" },
+    { title: "Launch polish", detail: "SEO metadata, sitemap & robots, social share images, and an accessibility pass.", status: "Planned" },
+];
+
+/** Decisions / tasks that need the owner's input. */
+export const needsInput: string[] = [
+    "Confirm real pricing (placeholder numbers are live now).",
+    "Rotate the access tokens shared during setup.",
+    "Have Privacy/Terms reviewed by a professional and set the Terms jurisdiction.",
+    "Set up production email (SMTP) for auth and notification emails.",
+];
+
 export const logEntries: LogEntry[] = [
     {
         date: "2026-06-28",
